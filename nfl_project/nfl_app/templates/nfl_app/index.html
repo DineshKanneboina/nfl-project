@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home Page</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'nfl_app/css/styles.css' %}">
+</head>
+<body class="home-page">
+    <nav class="navbar">
+        <a href="{% url 'index' %}" class="nav-link">Home</a>
+    </nav>
+    <div class="conference-container">
+        {% for conference, divisions in conferences.items %}
+            <div class="conference">
+                <h2>{{ conference }}</h2>
+                <div class="division-container">
+                    {% for division, teams in divisions.items %}
+                        <div class="division">
+                            <h3>{{ division }}</h3>
+                            <div class="grid-container">
+                                {% for team in teams %}
+                                    <a href="{% url 'team_detail' team_id=team.id %}" class="team-link">
+                                        <div class="team-icon">
+                                            <img src="{{ team.logo }}" alt="{{ team.name }}" class="team-logo">
+                                            <div class="team-name">{{ team.name }}</div>
+                                        </div>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>

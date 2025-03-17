@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ team_name }} Statistics (2024-2025) Season</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'nfl_app/css/styles.css' %}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="{% url 'index' %}" class="nav-link">Home</a>
+    </nav>
+    <!-- <h1>{{ team_name }} Statistics (2024-2025) Season</h1> -->
+    <div class="team-detail">
+        <div class="team-header">
+            <img src="{{ logo }}" alt="{{ team_name }} Logo" class="team-logo-detail-page">
+            <div class="team-name-detail-page">{{ team_name }}</div>
+        </div>
+        <div class="team-info">
+            <p><strong>Abbreviation:</strong> {{ team_info.abbreviation }}</p>
+            <p><strong>Location:</strong> {{ team_info.location }}</p>
+            <p><strong>Nickname:</strong> {{ team_info.nickname }}</p>
+            <p><strong>Color:</strong> {{ team_info.color }}</p>
+            <p><strong>ID:</strong> {{ team_info.id }}</p>
+            <p><strong>Slug:</strong> {{ team_info.slug }}</p>
+            <p><strong>Division:</strong> {{ team_info.division }}</p>
+            <p><strong>Venue:</strong> {{ team_info.venue }}</p>
+        </div>
+        <div class="plot">{{ plot|safe }}</div>
+        <div class="athletes">
+            <h2>Athletes</h2>
+            <table id="athletes-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Position</th>
+                        <th>Jersey Number</th>
+                    </tr>
+                </thead>
+                <tbody id="athletes-container">
+                    <!-- Athletes data will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+        <div class="depth-chart">
+            <h2>Depth Chart</h2>
+            <div id="depth-chart-container">
+                <!-- Depth chart data will be loaded here -->
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            // Fetch athletes data
+            $.ajax({
+                url: "{% url 'fetch_athletes' team_id %}",
+                method: "GET",
+                success: function(data) {
+                    var athletesHtml = "";
+                    data.athletes.forEach(function(athlete) {
+                        athletesHtml += "<tr><td>" + athlete.name + "</td><td>" + athlete.position + "</td><td>" + athlete.jersey + "</td></tr>";
+                    });
+                    $("#athletes-container").html(athletesHtml);
+                }
+            });
+
+            // Fetch depth chart data
+            $.ajax({
+                url: "{% url 'fetch_depth_chart' team_id %}",
+                method: "GET",
+                success: function(data) {
+                    var depthChartHtml = "";
+                    data.depth_chart.forEach(function(depth_chart) {
+                        depthChartHtml += "<h3>" + depth_chart.name + "</h3>";
+                        depth_chart.positions.forEach(function(position) {
+                            depthChartHtml += "<h4>" + position.position_name + "</h4>";
+                            position.athletes.forEach(function(athlete) {
+                                depthChartHtml += "<p><strong>Name:</strong> " + athlete.name + " | <strong>Rank:</strong> " + athlete.rank + "</p>";
+                            });
+                        });
+                    });
+                    $("#depth-chart-container").html(depthChartHtml);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
